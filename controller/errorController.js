@@ -1,4 +1,4 @@
-const AppError = require('../utils/AppError.js');
+import AppError from '../utils/AppError.js';
 
 const handleCastError = (err) => {
   const map = { _id: 'id' };
@@ -77,4 +77,4 @@ const globalErrorHandler = (err, req, res, next) => {
   }
 };
 
-module.exports = globalErrorHandler;
+export default globalErrorHandler;

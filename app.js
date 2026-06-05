@@ -1,16 +1,18 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
-const app = express();
-const globalErrorHandler = require('./controller/errorController.js');
-const AppError = require('./utils/AppError.js');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 
-const authRoutes = require('./routes/authRoutes.js');
+import globalErrorHandler from './controller/errorController.js';
+import AppError from './utils/AppError.js';
+import authRoutes from './routes/authRoutes.js';
+
+const app = express();
 
 app.use(cors());
 app.use(helmet());
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -19,14 +21,16 @@ app.use(
     message: 'To many requests try again in 15 mins!',
   })
 );
+
 app.use(express.json());
 app.use(mongoSanitize());
 
 app.use('/api/v1/auth', authRoutes);
+
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));
 });
 
 app.use(globalErrorHandler);
 
-module.exports = app;
+export default app;
