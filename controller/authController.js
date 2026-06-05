@@ -58,6 +58,14 @@ export const signUp = async (req, res, next) => {
   });
 };
 
+export const getMe = async (req, res, next) => {
+  res.status(200).json({
+    status: 'success',
+    data: { ...req.user },
+    message: 'User found',
+  });
+};
+
 export const protectedRoute = async (req, res, next) => {
   if (
     !req.headers.authorization ||

@@ -56,6 +56,15 @@ Schema.methods.validatePassword = async function (newPassowrd, oldPassword) {
   return await bcryptjs.compare(newPassowrd, oldPassword);
 };
 
+Schema.set('toJSON', {
+  transform(doc, ret) {
+    delete ret.token;
+    delete ret.password;
+    delete ret.deletedAt;
+    return ret;
+  },
+});
+
 const Model = mongoose.model('User', Schema);
 
 export default Model;
