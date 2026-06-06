@@ -1,43 +1,38 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
+import crypto from 'crypto';
 
 const Schema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name is required'],
+      required: true,
+      trim: true,
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: true,
       unique: true,
       lowercase: true,
-      validate: {
-        validator: validator.isEmail,
-        message: "Email isn't coorect",
-      },
-    },
-    lang: {
-      type: String,
-      enum: {
-        values: ['en', 'ar'],
-        default: 'en',
-        message: 'Lang is either: en, ar',
-      },
-    },
-    theme: {
-      type: String,
-      enum: {
-        values: ['dark', 'light'],
-        default: 'dark',
-        message: 'Theme is either: dark, light',
-      },
+      trim: true,
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: true,
     },
+    lang: {
+      type: String,
+      enum: ['en', 'ar'],
+      default: 'en',
+    },
+    theme: {
+      type: String,
+      enum: ['dark', 'light'],
+      default: 'dark',
+    },
+    confirmEmailOTP: String,
+    confirmEmailOTPExpires: Date,
     token: String,
     deletedAt: Date,
   },
@@ -49,17 +44,34 @@ const Schema = new mongoose.Schema(
 Schema.pre('save', async function () {
   if (!this.isModified('password')) return;
   this.password = await bcryptjs.hash(this.password, 12);
-  this.token = undefined;
 });
 
-Schema.methods.validatePassword = async function (newPassowrd, oldPassword) {
-  return await bcryptjs.compare(newPassowrd, oldPassword);
+Schema.methods.generateconfirmEmailOTP = function () {
+  const otp = crypto.randomInt(100000, 999999).toString();
+  this.confirmEmailOTP = crypto.createHash('sha256').update(otp).digest('hex');
+  this.confirmEmailOTPExpires = Date.now() + 5 * 60 * 1000;
+  return otp;
+};
+
+Schema.methods.validatePassword = async function (comparePass) {
+  return await bcryptjs.compare(comparePass, this.password);
+};
+
+Schema.methods.validateConfirmEmailOTP = function (newOTP) {
+  const hashed = crypto.createHash('sha256').update(newOTP).digest('hex');
+  return hashed === this.confirmEmailOTP;
+};
+
+Schema.methods.validateConfirmEmailOTPExpires = function (Expires) {
+  return Date.now() < Expires;
 };
 
 Schema.set('toJSON', {
   transform(doc, ret) {
     delete ret.token;
     delete ret.password;
+    delete ret.confirmEmailOTP;
+    delete ret.confirmEmailOTPExpires;
     delete ret.deletedAt;
     return ret;
   },

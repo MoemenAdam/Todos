@@ -1,15 +1,24 @@
 import express from 'express';
 import {
-  protectedRoute,
   login,
   signUp,
+  confirmEmail,
   logOut,
   getMe,
 } from '../controller/authController.js';
+import {
+  loginSchema,
+  signUpSchema,
+  confirmEmailSchema,
+} from '../validators/authValidator.js';
+import protectedRoute from '../middleware/protectedRoute.js';
+import validate from '../middleware/schemaValidator.js';
+
 const Router = express.Router();
 
-Router.post('/login', login);
-Router.post('/signUp', signUp);
+Router.post('/login', validate(loginSchema), login);
+Router.post('/signUp', validate(signUpSchema), signUp);
+Router.post('/confirmEmail', validate(confirmEmailSchema), confirmEmail);
 
 Router.use(protectedRoute);
 Router.post('/logOut', logOut);
