@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import mongoSanitize from 'express-mongo-sanitize';
 
 import globalErrorHandler from './controller/errorController.js';
 import AppError from './utils/AppError.js';
@@ -21,9 +20,7 @@ app.use(
     message: 'To many requests try again in 15 mins!',
   })
 );
-
 app.use(express.json());
-app.use(mongoSanitize());
 
 app.use('/api/v1/auth', authRoutes);
 

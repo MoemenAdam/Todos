@@ -1,4 +1,4 @@
-import JWT from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
 
 export const generateJWT = (id) => {

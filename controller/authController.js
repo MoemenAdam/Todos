@@ -19,10 +19,10 @@ export const login = async (req, res, next) => {
       await validateJWT(user.token);
       token = user.token;
     } catch (err) {
-      token = await generateJWT(user._id);
+      token = generateJWT(user._id);
     }
   } else {
-    token = await generateJWT(user._id);
+    token = generateJWT(user._id);
   }
   user.token = token;
   await user.save({ validateBeforeSave: false });
@@ -47,7 +47,7 @@ export const signUp = async (req, res, next) => {
   const { name, email, password } = req.body;
   const user = await UserModel.create({ name, email, password });
 
-  const token = await generateJWT(user._id);
+  const token = generateJWT(user._id);
   user.token = token;
   await user.save({ validateBeforeSave: false });
 

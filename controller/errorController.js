@@ -42,7 +42,7 @@ const handleJWTExpiredError = () =>
   new AppError('Your token has expired! Please log in again.', 401);
 
 const DevErrors = (err, res) => {
-  res.statusCode(err.statusCode).json({
+  res.status(err.statusCode).json({
     status: err.status,
     error: err,
     message: err.message,
@@ -52,14 +52,14 @@ const DevErrors = (err, res) => {
 
 const ProdErrors = (err, res) => {
   if (err.isOperational) {
-    res.statusCode(err.status).json({
+    res.status(err.statusCode).json({
       status: err.status,
       error: err.errors,
       message: err.message,
     });
   } else {
     console.error('ERROR 💥', err);
-    res.statusCode(500).json({
+    res.status(500).json({
       status: 'error',
       message: 'Somthing went wrong',
     });
@@ -71,7 +71,7 @@ const globalErrorHandler = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    DevErrors(Error, res);
+    DevErrors(err, res);
   } else {
     let error = structuredClone(err);
     if (error.name === 'CastError') error = handleCastError(error);
