@@ -73,7 +73,7 @@ const globalErrorHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     DevErrors(err, res);
   } else {
-    let error = structuredClone(err);
+    let error = { ...err };
     if (error.name === 'CastError') error = handleCastError(error);
     else if (error.name === 'ValidationError')
       error = handleValidationError(error);

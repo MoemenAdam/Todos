@@ -44,8 +44,8 @@ export const logOut = async (req, res, next) => {
 };
 
 export const signUp = async (req, res, next) => {
-  const { name, email, password } = req.body;
-  const user = await UserModel.create({ name, email, password });
+  const { name, email, password, lang, theme } = req.body;
+  const user = await UserModel.create({ name, email, password, lang, theme });
 
   const token = generateJWT(user._id);
   user.token = token;
@@ -61,7 +61,7 @@ export const signUp = async (req, res, next) => {
 export const getMe = async (req, res, next) => {
   res.status(200).json({
     status: 'success',
-    data: { ...req.user },
+    data: req.user,
     message: 'User found',
   });
 };
