@@ -24,10 +24,11 @@ if (process.env.NODE_ENV === 'development') {
 process.on('unhandledRejection', (err) => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
   console.log(err.name, err.message);
-
-  server.close(() => {
+  if (server?.close) {
+    server.close(() => process.exit(1));
+  } else {
     process.exit(1);
-  });
+  }
 });
 
 export default app;
