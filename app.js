@@ -35,25 +35,6 @@ app.use(
     swaggerOptions: {
       persistAuthorization: true,
     },
-    customJs: `
-      window.onload = function() {
-        const originalFetch = window.fetch;
-        window.fetch = async function(...args) {
-          const response = await originalFetch(...args);
-          const clone = response.clone();
-          try {
-            const data = await clone.json();
-            if (data?.token) {
-              const ui = window.ui;
-              ui.preauthorizeApiKey('bearerAuth', data.token);
-              console.log('✅ Token saved automatically');
-            }
-          } catch (_) {}
-
-          return response;
-        };
-      };
-    `,
   })
 );
 app.use('/api/v1/auth', authRoutes);
