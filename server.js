@@ -14,12 +14,9 @@ mongoose.connect(DB).then(() => {
   console.log('DB connected successfully');
 });
 
-let server = {};
-if (process.env.NODE_ENV === 'development') {
-  server = app.listen(3000, () => {
-    console.log('Server running on port 3000');
-  });
-}
+let server = app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
 
 process.on('unhandledRejection', (err) => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
