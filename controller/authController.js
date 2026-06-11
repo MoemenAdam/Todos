@@ -89,16 +89,17 @@ export const confirmEmail = async (req, res, next) => {
   if (!user.validateConfirmEmailOTPExpires(user.confirmEmailOTPExpires))
     return next(new AppError('OTP is Expired Login again to get new OTP', 400));
 
-  const token = generateJWT(user._id);
-  user.token = token;
   user.confirmEmailOTP = undefined;
   user.confirmEmailOTPExpires = undefined;
   await user.save({ validateBeforeSave: false });
+  await sendEmail({
+    email: user.email,
+    type: 'EMAIL_CONFIRMED',
+  });
 
   res.status(200).json({
     status: 'success',
-    token,
-    message: 'Email confirmed successfully',
+    message: 'Email confirmed successfully please login',
   });
 };
 

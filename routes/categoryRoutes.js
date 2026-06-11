@@ -1,21 +1,16 @@
 import express from 'express';
-import {
-  getAll,
-  create,
-  getOne,
-  update,
-  deleteOne,
-} from '../controller/categoryController.js';
+import { getAll, create, getOne, update, deleteOne } from '../utils/CRUDS.js';
 import validate from '../middleware/schemaValidator.js';
-import { deleteAndCreateSchema } from '../validators/categoryValidators.js';
+import { categorySchema } from '../validators/categoryValidators.js';
+import CategoryModel from '../models/categoryModel.js';
 
 const Router = express.Router();
 
-Router.get('/', getAll);
-Router.post('/', validate(deleteAndCreateSchema), create);
+Router.get('/', getAll(CategoryModel));
+Router.post('/', validate(categorySchema), create(CategoryModel));
 Router.route('/:id')
-  .get(getOne)
-  .patch(validate(deleteAndCreateSchema), update)
-  .delete(deleteOne);
+  .get(getOne(CategoryModel))
+  .patch(validate(categorySchema), update(CategoryModel))
+  .delete(deleteOne(CategoryModel));
 
 export default Router;

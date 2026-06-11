@@ -7,6 +7,7 @@ import AppError from './utils/AppError.js';
 import { swaggerSpec } from './swagger.js';
 import authRoutes from './routes/authRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.get('/api-docs', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/tasks', taskRoutes);
 
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));

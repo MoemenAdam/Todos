@@ -4,37 +4,55 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 extendZodWithOpenApi(z);
 
 const passwordSchema = z
-  .string({ required_error: 'Password is required' })
-  .min(8, 'Password must be at least 8 characters')
-  .regex(/[A-Z]/, 'Must contain uppercase letter')
-  .regex(/[0-9]/, 'Must contain number');
-
-export const loginSchema = z
-  .object({
-    email: z.email('Invalid email address'),
-    password: passwordSchema,
+  .string({
+    required_error: 'Password is required',
+    invalid_type_error: 'Password must be a string',
   })
-  .strip();
+  .min(8, 'Password must be at least 8 characters long')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number');
 
-export const signUpSchema = z
-  .object({
-    name: z
-      .string({ required_error: 'Name is required' })
-      .trim()
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name must not exceed 50 characters'),
-    email: z.email('Invalid email address').trim().toLowerCase(),
-    password: passwordSchema,
-    lang: z.enum(['en', 'ar']).default('en'),
-    theme: z.enum(['dark', 'light']).default('dark'),
+const emailSchema = z
+  .email({
+    required_error: 'Email is required',
   })
-  .strip();
+  .trim()
+  .toLowerCase();
 
-export const confirmEmailSchema = z
-  .object({
-    email: z.email('Invalid email address'),
-    otp: z
-      .string({ required_error: 'OTP is required' })
-      .regex(/^\d{6}$/, 'OTP must be exactly 6 digits'),
-  })
-  .strip();
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+});
+
+export const signUpSchema = z.object({
+  name: z
+    .string({
+      required_error: 'Name is required',
+      invalid_type_error: 'Name must be a string',
+    })
+    .trim()
+    .min(2, 'Name must be at least 2 characters long')
+    .max(50, 'Name must not exceed 50 characters'),
+  email: emailSchema,
+  password: passwordSchema,
+  lang: z.enum(['en', 'ar'], {
+    errorMap: () => ({
+      message: 'Language must be either "en" or "ar"',
+    }),
+  }),
+  theme: z.enum(['dark', 'light'], {
+    errorMap: () => ({
+      message: 'Theme must be either "dark" or "light"',
+    }),
+  }),
+});
+
+export const confirmEmailSchema = z.object({
+  email: emailSchema,
+  otp: z
+    .string({
+      required_error: 'OTP is required',
+      invalid_type_error: 'OTP must be a string',
+    })
+    .regex(/^\d{6}$/, 'OTP must be exactly 6 digits'),
+});
