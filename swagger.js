@@ -8,6 +8,7 @@ import {
   signUpSchema,
   confirmEmailSchema,
 } from './validators/authValidator.js';
+import { taskSchema } from './validators/taskValidators.js';
 
 export const registry = new OpenAPIRegistry();
 
@@ -166,6 +167,208 @@ registry.registerPath({
     },
     401: {
       description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+const TaskSchema = registry.register(
+  'Task',
+  z.object({
+    _id: z.string().openapi({ example: '664f1b2c9e1a2b3c4d5e6f7a' }),
+    title: z.string().openapi({ example: 'Buy groceries' }),
+    description: z
+      .string()
+      .optional()
+      .openapi({ example: 'Milk, eggs, bread' }),
+    category: z
+      .string()
+      .openapi({ example: '664f1b2c9e1a2b3c4d5e6f7b' }),
+    userId: z
+      .string()
+      .optional()
+      .openapi({ example: '664f1b2c9e1a2b3c4d5e6f7c' }),
+    priority: z.enum(['low', 'med', 'high']).optional().openapi({ example: 'med' }),
+    dueDate: z
+      .string()
+      .optional()
+      .openapi({ format: 'date-time', example: '2026-06-15T00:00:00.000Z' }),
+    isComplete: z.boolean().openapi({ example: false }),
+    createdAt: z.string().openapi({ format: 'date-time' }),
+    updatedAt: z.string().openapi({ format: 'date-time' }),
+  })
+);
+
+const TaskListResponse = z.object({
+  status: z.string().openapi({ example: 'success' }),
+  total: z.number().openapi({ example: 25 }),
+  data: z.array(TaskSchema),
+});
+
+const TaskResponse = z.object({
+  status: z.string().openapi({ example: 'success' }),
+  data: TaskSchema,
+  message: z.string().optional(),
+});
+
+const taskIdParam = z.object({
+  id: z.string().openapi({ example: '664f1b2c9e1a2b3c4d5e6f7a' }),
+});
+
+const paginationQuery = z.object({
+  page: z.string().optional().openapi({ example: '1' }),
+  limit: z.string().optional().openapi({ example: '10' }),
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/tasks',
+  tags: ['Tasks'],
+  summary: 'Get all tasks for the logged-in user',
+  security: [{ bearerAuth: [] }],
+  request: { query: paginationQuery },
+  responses: {
+    200: {
+      description: 'Paginated task list',
+      content: { 'application/json': { schema: TaskListResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/tasks',
+  tags: ['Tasks'],
+  summary: 'Create a new task',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: taskSchema } },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Task created',
+      content: {
+        'application/json': {
+          schema: TaskResponse.extend({
+            message: z
+              .string()
+              .openapi({ example: 'Document created successfully' }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Validation error',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/tasks/{id}',
+  tags: ['Tasks'],
+  summary: 'Get a single task by ID',
+  security: [{ bearerAuth: [] }],
+  request: { params: taskIdParam },
+  responses: {
+    200: {
+      description: 'Task found',
+      content: { 'application/json': { schema: TaskResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    403: {
+      description: 'Task does not belong to the current user',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    404: {
+      description: 'Task not found',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'patch',
+  path: '/tasks/{id}',
+  tags: ['Tasks'],
+  summary: 'Update a task by ID',
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: taskIdParam,
+    body: {
+      required: true,
+      content: { 'application/json': { schema: taskSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Task updated',
+      content: {
+        'application/json': {
+          schema: TaskResponse.extend({
+            message: z
+              .string()
+              .openapi({ example: 'Document updated successfully' }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Validation error',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    403: {
+      description: 'Task does not belong to the current user',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    404: {
+      description: 'Task not found',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'delete',
+  path: '/tasks/{id}',
+  tags: ['Tasks'],
+  summary: 'Delete a task by ID',
+  security: [{ bearerAuth: [] }],
+  request: { params: taskIdParam },
+  responses: {
+    204: {
+      description: 'Task deleted',
+      content: { 'application/json': { schema: TaskResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    403: {
+      description: 'Task does not belong to the current user',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    404: {
+      description: 'Task not found',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
