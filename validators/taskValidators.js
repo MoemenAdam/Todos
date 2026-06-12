@@ -40,9 +40,9 @@ export const taskSchema = z.object({
     })
     .optional(),
 
-  isComplete: z
+  isCompleted: z
     .boolean({
-      invalid_type_error: 'isComplete must be a boolean value',
+      invalid_type_error: 'isCompleted must be a boolean value',
     })
     .optional(),
 });

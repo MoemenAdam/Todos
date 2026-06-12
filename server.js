@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-dotenv.config({
-  path: '.env',
-});
+dotenv.config({ path: '.env' });
 import app from './app.js';
 
 const DB = process.env.DATABASE.replace(
@@ -10,9 +8,12 @@ const DB = process.env.DATABASE.replace(
   process.env.DATABASE_PASSWORD
 );
 
-mongoose.connect(DB).then(() => {
-  console.log('DB connected successfully');
-});
+mongoose
+  .connect(DB)
+  .then(() => {
+    console.log('DB connected successfully');
+  })
+  .catch((err) => console.error('DB connection failed:', err.message));
 
 let server = app.listen(3000, () => {
   console.log('Server running on port 3000');

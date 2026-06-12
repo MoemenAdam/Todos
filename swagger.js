@@ -118,8 +118,8 @@ registry.registerPath({
   },
   responses: {
     200: {
-      description: 'Email confirmed — token returned',
-      content: { 'application/json': { schema: TokenResponse } },
+      description: 'Email confirmed successfully',
+      content: { 'application/json': { schema: SuccessResponse } },
     },
     400: {
       description: 'Wrong OTP / Expired OTP',
@@ -172,6 +172,40 @@ registry.registerPath({
   },
 });
 
+const MyProgressResponse = registry.register(
+  'MyProgress',
+  z.object({
+    total: z.number().openapi({ example: 10 }),
+    completedPosts: z.number().openapi({ example: 4 }),
+    progress: z.string().openapi({ example: '40%' }),
+  })
+);
+
+registry.registerPath({
+  method: 'get',
+  path: '/auth/myProgress',
+  tags: ['Auth'],
+  summary: 'Get task completion progress for the logged-in user',
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: 'Task completion progress',
+      content: {
+        'application/json': {
+          schema: z.object({
+            status: z.string().openapi({ example: 'success' }),
+            data: MyProgressResponse,
+          }),
+        },
+      },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
 const TaskSchema = registry.register(
   'Task',
   z.object({
@@ -193,7 +227,7 @@ const TaskSchema = registry.register(
       .string()
       .optional()
       .openapi({ format: 'date-time', example: '2026-06-15T00:00:00.000Z' }),
-    isComplete: z.boolean().openapi({ example: false }),
+    isCompleted: z.boolean().openapi({ example: false }),
     createdAt: z.string().openapi({ format: 'date-time' }),
     updatedAt: z.string().openapi({ format: 'date-time' }),
   })
