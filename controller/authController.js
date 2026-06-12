@@ -1,4 +1,5 @@
 import UserModel from '../models/userModel.js';
+import TaskModel from '../models/taskModel.js';
 import AppError from '../utils/AppError.js';
 import { generateJWT, validateJWT } from '../utils/JWT.js';
 import sendEmail from '../utils/Email.js';
@@ -108,5 +109,21 @@ export const getMe = async (req, res, next) => {
     status: 'success',
     data: req.user,
     message: 'User found',
+  });
+};
+
+export const getMyProgress = async (req, res, next) => {
+  const posts = await TaskModel.find({
+    userId: req.user._id,
+    isCompleted: true,
+  });
+  const total = await TaskModel.countDocuments({ userId: req.user._id });
+  res.status(200).json({
+    status: 'success',
+    data: {
+      total,
+      completedPosts: posts.length,
+      progress: `${(posts.length / total) * 100}%`,
+    },
   });
 };

@@ -11,7 +11,6 @@ import TaskModel from '../models/taskModel.js';
 const Router = express.Router();
 
 Router.use(protectedRoute);
-Router.use('/:id', isIdBelongsToMe(TaskModel));
 
 Router.get('/', (req, res, next) => {
   return getAll(TaskModel, { userId: req.user._id })(req, res, next);
@@ -22,6 +21,8 @@ Router.post(
   assignToUser('userId'),
   create(TaskModel)
 );
+
+Router.use(isIdBelongsToMe(TaskModel));
 Router.route('/:id')
   .get(getOne(TaskModel))
   .patch(validate(taskSchema), update(TaskModel))

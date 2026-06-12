@@ -23,7 +23,7 @@ const Schema = new mongoose.Schema(
       enum: ['low', 'med', 'high'],
     },
     dueDate: Date,
-    isComplete: {
+    isCompleted: {
       type: Boolean,
       default: false,
     },
