@@ -54,7 +54,10 @@ const ProdErrors = (err, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
-      error: err.errors,
+      ...(err.errors &&
+        Object.keys(err.errors).length > 0 && {
+          errors: err.errors,
+        }),
       message: err.message,
     });
   } else {
@@ -74,6 +77,7 @@ const globalErrorHandler = (err, req, res, next) => {
     DevErrors(err, res);
   } else {
     let error = { ...err };
+    error.message = err.message;
     if (error.name === 'CastError') error = handleCastError(error);
     else if (error.name === 'ValidationError')
       error = handleValidationError(error);
