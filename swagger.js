@@ -9,6 +9,7 @@ import {
   confirmEmailSchema,
 } from './validators/authValidator.js';
 import { taskSchema } from './validators/taskValidators.js';
+import { categorySchema } from './validators/categoryValidators.js';
 
 export const registry = new OpenAPIRegistry();
 
@@ -403,6 +404,182 @@ registry.registerPath({
     },
     404: {
       description: 'Task not found',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+const calendarQuery = z.object({
+  type: z
+    .enum(['overdue', 'late', 'done'])
+    .openapi({ example: 'overdue', description: 'Filter tasks by calendar view' }),
+  page: z.string().optional().openapi({ example: '1' }),
+  limit: z.string().optional().openapi({ example: '10' }),
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/tasks/calendar',
+  tags: ['Tasks'],
+  summary: 'Get tasks filtered by calendar type',
+  description:
+    'Returns paginated tasks for the logged-in user. `type` must be one of: overdue, late, or done.',
+  security: [{ bearerAuth: [] }],
+  request: { query: calendarQuery },
+  responses: {
+    200: {
+      description: 'Filtered task list',
+      content: { 'application/json': { schema: TaskListResponse } },
+    },
+    400: {
+      description: 'Missing or invalid type query parameter',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+const CategorySchema = registry.register(
+  'Category',
+  z.object({
+    _id: z.string().openapi({ example: '664f1b2c9e1a2b3c4d5e6f7d' }),
+    name: z.string().openapi({ example: 'Work' }),
+    createdAt: z.string().openapi({ format: 'date-time' }),
+    updatedAt: z.string().openapi({ format: 'date-time' }),
+  })
+);
+
+const CategoryListResponse = z.object({
+  status: z.string().openapi({ example: 'success' }),
+  total: z.number().openapi({ example: 5 }),
+  data: z.array(CategorySchema),
+});
+
+const CategoryResponse = z.object({
+  status: z.string().openapi({ example: 'success' }),
+  data: CategorySchema,
+  message: z.string().optional(),
+});
+
+const categoryIdParam = z.object({
+  id: z.string().openapi({ example: '664f1b2c9e1a2b3c4d5e6f7d' }),
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/categories',
+  tags: ['Categories'],
+  summary: 'Get all categories',
+  request: { query: paginationQuery },
+  responses: {
+    200: {
+      description: 'Paginated category list',
+      content: { 'application/json': { schema: CategoryListResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/categories',
+  tags: ['Categories'],
+  summary: 'Create a new category',
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: categorySchema } },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Category created',
+      content: {
+        'application/json': {
+          schema: CategoryResponse.extend({
+            message: z
+              .string()
+              .openapi({ example: 'Document created successfully' }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Validation error',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/categories/{id}',
+  tags: ['Categories'],
+  summary: 'Get a single category by ID',
+  request: { params: categoryIdParam },
+  responses: {
+    200: {
+      description: 'Category found',
+      content: { 'application/json': { schema: CategoryResponse } },
+    },
+    404: {
+      description: 'Category not found',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'patch',
+  path: '/categories/{id}',
+  tags: ['Categories'],
+  summary: 'Update a category by ID',
+  request: {
+    params: categoryIdParam,
+    body: {
+      required: true,
+      content: { 'application/json': { schema: categorySchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Category updated',
+      content: {
+        'application/json': {
+          schema: CategoryResponse.extend({
+            message: z
+              .string()
+              .openapi({ example: 'Document updated successfully' }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Validation error',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    404: {
+      description: 'Category not found',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'delete',
+  path: '/categories/{id}',
+  tags: ['Categories'],
+  summary: 'Delete a category by ID',
+  request: { params: categoryIdParam },
+  responses: {
+    204: {
+      description: 'Category deleted',
+      content: { 'application/json': { schema: CategoryResponse } },
+    },
+    404: {
+      description: 'Category not found',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
