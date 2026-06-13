@@ -31,7 +31,7 @@ Router.route('/:id')
   .patch(validate(taskSchema), update(TaskModel))
   .delete(deleteOne(TaskModel));
 
-const calendarController = (req, res, next) => {
+function calendarController(req, res, next) {
   const type = req.query.type;
   if (!type || ['overdue', 'late', 'done'].includes(type))
     return next(
@@ -52,6 +52,6 @@ const calendarController = (req, res, next) => {
     res,
     next
   );
-};
+}
 
 export default Router;
