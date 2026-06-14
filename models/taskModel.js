@@ -14,7 +14,7 @@ const Schema = new mongoose.Schema(
       ref: 'Category',
       required: true,
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },

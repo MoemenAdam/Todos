@@ -123,7 +123,7 @@ export const getMyProgress = async (req, res, next) => {
     data: {
       total,
       completedPosts: posts.length,
-      progress: `${(posts.length / total) * 100}%`,
+      progress: `${(posts.length / Math.max(1, total)) * 100}%`,
     },
   });
 };

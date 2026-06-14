@@ -19,7 +19,7 @@ Router.get('/', (req, res, next) => {
 Router.post(
   '/',
   validate(taskSchema),
-  assignToUser('userId'),
+  assignToUser('user'),
   create(TaskModel)
 );
 
