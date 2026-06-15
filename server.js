@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 dotenv.config({ path: '.env' });
 import app from './app.js';
+import admin from 'firebase-admin';
 
 const DB = process.env.DATABASE.replace(
   '<db_password>',
@@ -10,6 +11,11 @@ const DB = process.env.DATABASE.replace(
 
 mongoose.connect(DB).then(() => {
   console.log('DB connected successfully');
+});
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+admin.initializeApp({
+  // credential: admin.credential.cert(serviceAccount),
 });
 
 let server = app.listen(3000, () => {

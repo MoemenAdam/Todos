@@ -4,8 +4,6 @@ import {
   signUp,
   confirmEmail,
   logOut,
-  getMe,
-  getMyProgress,
 } from '../controller/authController.js';
 import {
   loginSchema,
@@ -23,7 +21,5 @@ Router.post('/confirmEmail', validate(confirmEmailSchema), confirmEmail);
 
 Router.use(protectedRoute);
 Router.post('/logOut', logOut);
-Router.get('/me', getMe);
-Router.get('/myProgress', getMyProgress);
 
 export default Router;

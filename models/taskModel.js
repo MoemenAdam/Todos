@@ -22,7 +22,10 @@ const Schema = new mongoose.Schema(
       type: String,
       enum: ['low', 'med', 'high'],
     },
-    dueDate: Date,
+    dueDate: {
+      type: Date,
+      required: true,
+    },
     isCompleted: {
       type: Boolean,
       default: false,
@@ -32,6 +35,10 @@ const Schema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+Schema.index({
+  dueDate: 1,
+});
 
 const Model = mongoose.model('Task', Schema);
 

@@ -6,11 +6,12 @@ import globalErrorHandler from './controller/errorController.js';
 import AppError from './utils/AppError.js';
 import { swaggerSpec } from './swagger.js';
 import authRoutes from './routes/authRoutes.js';
+import cronJobRoutes from './routes/cronJobRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
-
 const app = express();
-
+;
 const swaggerUiOptions = {
   customCssUrl: 'https://unpkg.com/swagger-ui-dist@5/swagger-ui.css',
   customJs: [
@@ -95,6 +96,8 @@ app.use(
 app.use(express.json());
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/cron-jobs', cronJobRoutes);
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 

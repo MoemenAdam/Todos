@@ -32,13 +32,13 @@ export const taskSchema = z.object({
     })
     .optional(),
 
-  dueDate: z.coerce
-    .date({
-      errorMap: () => ({
-        message: 'Due date must be a valid date',
-      }),
-    })
-    .optional(),
+  dueDate: z.coerce.date({
+    required_error: 'dueDate is required',
+    invalid_type_error: 'dueDate must be a valid date',
+    errorMap: () => ({
+      message: 'Due date must be a valid date',
+    }),
+  }),
 
   isCompleted: z
     .boolean({

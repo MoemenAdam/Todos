@@ -31,6 +31,11 @@ const Schema = new mongoose.Schema(
       enum: ['dark', 'light'],
       default: 'dark',
     },
+    fcmTokens: [String],
+    allowNotification: {
+      type: Boolean,
+      default: true,
+    },
     confirmEmailOTP: String,
     confirmEmailOTPExpires: Date,
     token: String,
