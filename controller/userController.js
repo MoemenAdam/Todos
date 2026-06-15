@@ -13,7 +13,7 @@ export const getMyProgress = async (req, res, next) => {
     userId: req.user._id,
     isCompleted: true,
   });
-  const total = await TaskModel.countDocuments({ userId: req.user._id });
+  const total = await TaskModel.countDocuments({ user: req.user._id });
   res.status(200).json({
     status: 'success',
     data: {

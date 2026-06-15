@@ -10,6 +10,7 @@ import {
 } from './validators/authValidator.js';
 import { taskSchema } from './validators/taskValidators.js';
 import { categorySchema } from './validators/categoryValidators.js';
+import { fcmTokenSchema } from './validators/userValidators.js';
 
 export const registry = new OpenAPIRegistry();
 
@@ -49,6 +50,11 @@ const UserSchema = registry.register(
     email: z.string().email().openapi({ example: 'user@example.com' }),
     lang: z.enum(['en', 'ar']).openapi({ example: 'en' }),
     theme: z.enum(['dark', 'light']).openapi({ example: 'dark' }),
+    fcmTokens: z
+      .array(z.string())
+      .optional()
+      .openapi({ example: ['fcm-device-token-abc123'] }),
+    allowNotification: z.boolean().optional().openapi({ example: true }),
     createdAt: z.string().openapi({ format: 'date-time' }),
     updatedAt: z.string().openapi({ format: 'date-time' }),
   })
@@ -147,10 +153,19 @@ registry.registerPath({
   },
 });
 
+const MyProgressResponse = registry.register(
+  'MyProgress',
+  z.object({
+    total: z.number().openapi({ example: 10 }),
+    completedPosts: z.number().openapi({ example: 4 }),
+    progress: z.string().openapi({ example: '40%' }),
+  })
+);
+
 registry.registerPath({
   method: 'get',
-  path: '/auth/me',
-  tags: ['Auth'],
+  path: '/users/me',
+  tags: ['Users'],
   summary: 'Get current logged-in user',
   security: [{ bearerAuth: [] }],
   responses: {
@@ -173,19 +188,10 @@ registry.registerPath({
   },
 });
 
-const MyProgressResponse = registry.register(
-  'MyProgress',
-  z.object({
-    total: z.number().openapi({ example: 10 }),
-    completedPosts: z.number().openapi({ example: 4 }),
-    progress: z.string().openapi({ example: '40%' }),
-  })
-);
-
 registry.registerPath({
   method: 'get',
-  path: '/auth/myProgress',
-  tags: ['Auth'],
+  path: '/users/myProgress',
+  tags: ['Users'],
   summary: 'Get task completion progress for the logged-in user',
   security: [{ bearerAuth: [] }],
   responses: {
@@ -207,6 +213,34 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: 'post',
+  path: '/users/assignPushNotifcationToken',
+  tags: ['Users'],
+  summary: 'Register an FCM push notification token for the current user',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: fcmTokenSchema } },
+    },
+  },
+  responses: {
+    202: {
+      description: 'FCM token assigned successfully',
+      content: { 'application/json': { schema: SuccessResponse } },
+    },
+    400: {
+      description: 'Validation error',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
 const TaskSchema = registry.register(
   'Task',
   z.object({
@@ -219,14 +253,13 @@ const TaskSchema = registry.register(
     category: z
       .string()
       .openapi({ example: '664f1b2c9e1a2b3c4d5e6f7b' }),
-    userId: z
+    user: z
       .string()
       .optional()
       .openapi({ example: '664f1b2c9e1a2b3c4d5e6f7c' }),
     priority: z.enum(['low', 'med', 'high']).optional().openapi({ example: 'med' }),
     dueDate: z
       .string()
-      .optional()
       .openapi({ format: 'date-time', example: '2026-06-15T00:00:00.000Z' }),
     isCompleted: z.boolean().openapi({ example: false }),
     createdAt: z.string().openapi({ format: 'date-time' }),
@@ -326,12 +359,8 @@ registry.registerPath({
       description: 'Unauthorized',
       content: { 'application/json': { schema: ErrorResponse } },
     },
-    403: {
-      description: 'Task does not belong to the current user',
-      content: { 'application/json': { schema: ErrorResponse } },
-    },
     404: {
-      description: 'Task not found',
+      description: 'Task not found or does not belong to the current user',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -371,12 +400,8 @@ registry.registerPath({
       description: 'Unauthorized',
       content: { 'application/json': { schema: ErrorResponse } },
     },
-    403: {
-      description: 'Task does not belong to the current user',
-      content: { 'application/json': { schema: ErrorResponse } },
-    },
     404: {
-      description: 'Task not found',
+      description: 'Task not found or does not belong to the current user',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -398,12 +423,8 @@ registry.registerPath({
       description: 'Unauthorized',
       content: { 'application/json': { schema: ErrorResponse } },
     },
-    403: {
-      description: 'Task does not belong to the current user',
-      content: { 'application/json': { schema: ErrorResponse } },
-    },
     404: {
-      description: 'Task not found',
+      description: 'Task not found or does not belong to the current user',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -411,7 +432,7 @@ registry.registerPath({
 
 const calendarQuery = z.object({
   type: z
-    .enum(['overdue', 'late', 'done'])
+    .enum(['overdue', 'dueToday', 'done'])
     .openapi({ example: 'overdue', description: 'Filter tasks by calendar view' }),
   page: z.string().optional().openapi({ example: '1' }),
   limit: z.string().optional().openapi({ example: '10' }),
@@ -423,7 +444,7 @@ registry.registerPath({
   tags: ['Tasks'],
   summary: 'Get tasks filtered by calendar type',
   description:
-    'Returns paginated tasks for the logged-in user. `type` must be one of: overdue, late, or done.',
+    'Returns paginated tasks for the logged-in user. `type` must be one of: overdue, dueToday, or done.',
   security: [{ bearerAuth: [] }],
   request: { query: calendarQuery },
   responses: {
@@ -447,6 +468,10 @@ const CategorySchema = registry.register(
   z.object({
     _id: z.string().openapi({ example: '664f1b2c9e1a2b3c4d5e6f7d' }),
     name: z.string().openapi({ example: 'Work' }),
+    user: z
+      .string()
+      .optional()
+      .openapi({ example: '664f1b2c9e1a2b3c4d5e6f7c' }),
     createdAt: z.string().openapi({ format: 'date-time' }),
     updatedAt: z.string().openapi({ format: 'date-time' }),
   })
@@ -473,11 +498,16 @@ registry.registerPath({
   path: '/categories',
   tags: ['Categories'],
   summary: 'Get all categories',
+  security: [{ bearerAuth: [] }],
   request: { query: paginationQuery },
   responses: {
     200: {
       description: 'Paginated category list',
       content: { 'application/json': { schema: CategoryListResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
     },
   },
 });
@@ -486,7 +516,8 @@ registry.registerPath({
   method: 'post',
   path: '/categories',
   tags: ['Categories'],
-  summary: 'Create a new category',
+  summary: 'Create a new category for the logged-in user',
+  security: [{ bearerAuth: [] }],
   request: {
     body: {
       required: true,
@@ -510,6 +541,10 @@ registry.registerPath({
       description: 'Validation error',
       content: { 'application/json': { schema: ErrorResponse } },
     },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
   },
 });
 
@@ -518,14 +553,19 @@ registry.registerPath({
   path: '/categories/{id}',
   tags: ['Categories'],
   summary: 'Get a single category by ID',
+  security: [{ bearerAuth: [] }],
   request: { params: categoryIdParam },
   responses: {
     200: {
       description: 'Category found',
       content: { 'application/json': { schema: CategoryResponse } },
     },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
     404: {
-      description: 'Category not found',
+      description: 'Category not found or does not belong to the current user',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -536,6 +576,7 @@ registry.registerPath({
   path: '/categories/{id}',
   tags: ['Categories'],
   summary: 'Update a category by ID',
+  security: [{ bearerAuth: [] }],
   request: {
     params: categoryIdParam,
     body: {
@@ -560,8 +601,12 @@ registry.registerPath({
       description: 'Validation error',
       content: { 'application/json': { schema: ErrorResponse } },
     },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
     404: {
-      description: 'Category not found',
+      description: 'Category not found or does not belong to the current user',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -572,14 +617,19 @@ registry.registerPath({
   path: '/categories/{id}',
   tags: ['Categories'],
   summary: 'Delete a category by ID',
+  security: [{ bearerAuth: [] }],
   request: { params: categoryIdParam },
   responses: {
     204: {
       description: 'Category deleted',
       content: { 'application/json': { schema: CategoryResponse } },
     },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
     404: {
-      description: 'Category not found',
+      description: 'Category not found or does not belong to the current user',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },

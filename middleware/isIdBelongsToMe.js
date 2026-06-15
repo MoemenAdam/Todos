@@ -5,7 +5,7 @@ const isIdBelongsToMe = (Model) => {
     const userId = req.user._id;
     const documentId = req.params.id;
     const document = await Model.findById(documentId);
-    if (!document || document.userId.equals(userId))
+    if (!document || document.user.equals(userId))
       return next(new AppError('Document not found', 404));
 
     next();

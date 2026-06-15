@@ -47,7 +47,7 @@ function calendarController(req, res, next) {
   if (type === 'overdue') dueDate = { $lte: now };
   else if (type === 'dueToday') dueDate = { $gt: now, $lt: tomorrow };
   else if (type === 'done') isCompleted = true;
-  return getAll(TaskModel, { userId: req.user._id, dateFilter })(
+  return getAll(TaskModel, { user: req.user._id, dateFilter })(
     req,
     res,
     next
