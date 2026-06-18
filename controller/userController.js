@@ -9,8 +9,8 @@ export const getMe = async (req, res, next) => {
 };
 
 export const getMyProgress = async (req, res, next) => {
-  const posts = await TaskModel.find({
-    userId: req.user._id,
+  const tasks = await TaskModel.find({
+    user: req.user._id,
     isCompleted: true,
   });
   const total = await TaskModel.countDocuments({ user: req.user._id });
@@ -18,8 +18,8 @@ export const getMyProgress = async (req, res, next) => {
     status: 'success',
     data: {
       total,
-      completedPosts: posts.length,
-      progress: `${(posts.length / Math.max(1, total)) * 100}%`,
+      completedTasks: tasks.length,
+      progress: `${(tasks.length / Math.max(1, total)) * 100}%`,
     },
   });
 };

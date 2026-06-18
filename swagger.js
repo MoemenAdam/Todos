@@ -157,7 +157,7 @@ const MyProgressResponse = registry.register(
   'MyProgress',
   z.object({
     total: z.number().openapi({ example: 10 }),
-    completedPosts: z.number().openapi({ example: 4 }),
+    completedTasks: z.number().openapi({ example: 4 }),
     progress: z.string().openapi({ example: '40%' }),
   })
 );
