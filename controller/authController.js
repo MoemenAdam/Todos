@@ -23,9 +23,9 @@ export const login = async (req, res, next) => {
         type: 'CONFIRM_EMAIL',
         code: otp,
       });
-      return next(new AppError('Confirmation OTP sent to your email', 400));
+      return next(new AppError('Confirmation OTP sent to your email', 403));
     }
-    return next(new AppError('Confirm your email first', 400));
+    return next(new AppError('Confirm your email first', 403));
   }
 
   let token = '';
