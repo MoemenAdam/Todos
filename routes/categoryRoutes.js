@@ -10,7 +10,9 @@ import CategoryModel from '../models/categoryModel.js';
 const Router = express.Router();
 
 Router.use(protectedRoute);
-Router.get('/', getAll(CategoryModel));
+Router.get('/', (req, res, next) => {
+  return getAll(CategoryModel, { user: req.user._id })(req, res, next);
+});
 Router.post(
   '/',
   validate(categorySchema),
