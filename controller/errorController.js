@@ -15,9 +15,7 @@ const handleValidationError = (err) => {
   let errMessage = 'Validation error';
   Object.entries(err.errors).forEach(([key, value]) => {
     const message = (errors[key] =
-      value.name === 'CastError'
-        ? `${value.reason.value} is not valid`
-        : value.message);
+      value.name === 'CastError' ? `${key} is not found` : value.message);
     errMessage = message;
     return message;
   });
@@ -72,19 +70,16 @@ const ProdErrors = (err, res) => {
 const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
-
   if (process.env.NODE_ENV === 'development') {
     DevErrors(err, res);
   } else {
     let error = { ...err };
     error.message = err.message;
-    if (error.name === 'CastError') error = handleCastError(error);
-    else if (error.name === 'ValidationError')
-      error = handleValidationError(error);
-    else if (error.code === 11000) error = handleDuplicateError(error);
-    else if (error.name === 'JsonWebTokenError') error = handleJWTError();
-    else if (error.name === 'TokenExpiredError')
-      error = handleJWTExpiredError();
+    if (err.name === 'CastError') error = handleCastError(err);
+    else if (err.name === 'ValidationError') error = handleValidationError(err);
+    else if (err.code === 11000) error = handleDuplicateError(err);
+    else if (err.name === 'JsonWebTokenError') error = handleJWTError();
+    else if (err.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
     ProdErrors(error, res);
   }
