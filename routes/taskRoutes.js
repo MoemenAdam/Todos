@@ -14,7 +14,7 @@ const Router = express.Router();
 Router.use(protectedRoute);
 
 Router.get('/', (req, res, next) => {
-  return getAll(TaskModel, { user: req.user._id })(req, res, next);
+  return getAll(TaskModel, { user: req.user._id }, ['category'])(req, res, next);
 });
 Router.post(
   '/',
