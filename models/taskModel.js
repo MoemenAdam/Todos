@@ -38,6 +38,7 @@ const Schema = new mongoose.Schema(
 
 Schema.index({
   dueDate: 1,
+  user: 1
 });
 
 const Model = mongoose.model('Task', Schema);
