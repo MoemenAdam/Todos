@@ -16,6 +16,10 @@ const Schema = new mongoose.Schema(
   }
 );
 
+Schema.index({
+  user: 1,
+});
+
 const Model = mongoose.model('Category', Schema);
 
 export default Model;
