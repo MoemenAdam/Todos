@@ -24,7 +24,7 @@ Router.post('/', validate(taskSchema), assignToUser('user'), create(TaskModel));
 
 Router.get('/calendar', calendarController);
 
-Router.use(isIdBelongsToMe(TaskModel));
+Router.use('/:id', isIdBelongsToMe(TaskModel));
 Router.route('/:id')
   .get(getOne(TaskModel))
   .patch(validate(taskSchema), update(TaskModel))
