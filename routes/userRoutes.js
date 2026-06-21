@@ -7,7 +7,7 @@ import {
 } from '../controller/userController.js';
 import protectedRoute from '../middleware/protectedRoute.js';
 import validate from '../middleware/schemaValidator.js';
-import { fcmTokenSchema } from '../validators/userValidators.js';
+import { fcmTokenSchema, userSchema } from '../validators/userValidators.js';
 
 const Router = express.Router();
 
