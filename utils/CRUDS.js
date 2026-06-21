@@ -53,7 +53,7 @@ export const update = (Model, mainFilters = {}) => async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-  if (!data) return next(new AppError('Document not found', 404));
+  if (!data) return next(new AppError('Document not found on update', 404));
 
   res.status(200).json({
     status: 'success',

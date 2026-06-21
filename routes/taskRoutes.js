@@ -14,14 +14,13 @@ const Router = express.Router();
 Router.use(protectedRoute);
 
 Router.get('/', (req, res, next) => {
-  return getAll(TaskModel, { user: req.user._id }, ['category'])(req, res, next);
+  return getAll(TaskModel, { user: req.user._id }, ['category'])(
+    req,
+    res,
+    next
+  );
 });
-Router.post(
-  '/',
-  validate(taskSchema),
-  assignToUser('user'),
-  create(TaskModel)
-);
+Router.post('/', validate(taskSchema), assignToUser('user'), create(TaskModel));
 
 Router.get('/calendar', calendarController);
 
@@ -33,13 +32,14 @@ Router.route('/:id')
 
 function calendarController(req, res, next) {
   const type = req.query.type;
-  if (!type || ['overdue', 'dueToday', 'done'].includes(type))
+  if (!type || !['overdue', 'dueToday', 'done'].includes(type)) {
     return next(
       new AppError(
-        'Type is required and must be eather overdue, late or done',
+        'Type is required and must be eather overdue, dueToday or done',
         400
       )
     );
+  }
   let dateFilter = {};
   const now = new Date();
   const tomorrow = new Date();
@@ -47,11 +47,7 @@ function calendarController(req, res, next) {
   if (type === 'overdue') dueDate = { $lte: now };
   else if (type === 'dueToday') dueDate = { $gt: now, $lt: tomorrow };
   else if (type === 'done') isCompleted = true;
-  return getAll(TaskModel, { user: req.user._id, dateFilter })(
-    req,
-    res,
-    next
-  );
+  return getAll(TaskModel, { user: req.user._id, dateFilter })(req, res, next);
 }
 
 export default Router;
