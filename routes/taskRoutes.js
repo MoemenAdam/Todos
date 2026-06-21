@@ -33,7 +33,7 @@ Router.route('/:id')
 
 function calendarController(req, res, next) {
   const type = req.query.type;
-  if (!type || ['overdue', 'late', 'done'].includes(type))
+  if (!type || ['overdue', 'dueToday', 'done'].includes(type))
     return next(
       new AppError(
         'Type is required and must be eather overdue, late or done',

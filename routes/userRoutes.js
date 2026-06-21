@@ -3,6 +3,7 @@ import {
   getMe,
   getMyProgress,
   assignFCMtoken,
+  updateMe,
 } from '../controller/userController.js';
 import protectedRoute from '../middleware/protectedRoute.js';
 import validate from '../middleware/schemaValidator.js';
@@ -12,6 +13,7 @@ const Router = express.Router();
 
 Router.use(protectedRoute);
 Router.get('/me', getMe);
+Router.patch('/updateMe', validate(userSchema), updateMe);
 Router.get('/myProgress', getMyProgress);
 Router.post(
   '/assignPushNotifcationToken',

@@ -8,6 +8,14 @@ export const getMe = async (req, res, next) => {
   });
 };
 
+export const updateMe = async (req, res, next) => {
+  res.status(200).json({
+    status: 'success',
+    data: req.user,
+    message: 'User updated successfully found',
+  });
+};
+
 export const getMyProgress = async (req, res, next) => {
   const tasks = await TaskModel.find({
     user: req.user._id,
