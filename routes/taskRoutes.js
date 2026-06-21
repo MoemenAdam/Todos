@@ -44,9 +44,10 @@ function calendarController(req, res, next) {
   const now = new Date();
   const tomorrow = new Date();
   tomorrow.setHours(24, 0, 0, 0);
-  if (type === 'overdue') dueDate = { $lte: now };
-  else if (type === 'dueToday') dueDate = { $gt: now, $lt: tomorrow };
-  else if (type === 'done') isCompleted = true;
+  if (type === 'overdue') dateFilter.dueDate = { $lte: now };
+  else if (type === 'dueToday')
+    dateFilter.dueDate = { $gt: now, $lt: tomorrow };
+  else if (type === 'done') dateFilter.isCompleted = true;
   return getAll(TaskModel, { user: req.user._id, dateFilter })(req, res, next);
 }
 
