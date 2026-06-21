@@ -40,7 +40,7 @@ export const getOne = (Model, mainFilters = {}) => async (req, res, next) => {
 export const deleteOne = (Model, mainFilters = {}) => async (req, res, next) => {
   const id = req.params.id;
   const data = await Model.findByIdAndDelete(id);
-  if (!data) return next(new AppError('Document not found', 404));
+  if (!data) return next(new AppError('Document not found on delete', 404));
   res.status(204).json({
     status: 'success',
     data,
