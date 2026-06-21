@@ -40,7 +40,7 @@ export const getOne = (Model, mainFilters = {}) => async (req, res, next) => {
 export const deleteOne = (Model, mainFilters = {}) => async (req, res, next) => {
   const id = req.params.id;
   const data = await Model.findByIdAndDelete(id);
-  if (!data) return next(new AppError('Document not found on delete', 404));
+  if (!data) return next(new AppError('Document not found', 404));
   res.status(204).json({
     status: 'success',
     data,
@@ -53,7 +53,7 @@ export const update = (Model, mainFilters = {}) => async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-  if (!data) return next(new AppError('Document not found on update', 404));
+  if (!data) return next(new AppError('Document not found', 404));
 
   res.status(200).json({
     status: 'success',
