@@ -48,7 +48,11 @@ function calendarController(req, res, next) {
   else if (type === 'dueToday')
     dateFilter.dueDate = { $gt: now, $lt: tomorrow };
   else if (type === 'done') dateFilter.isCompleted = true;
-  return getAll(TaskModel, { user: req.user._id, dateFilter })(req, res, next);
+  return getAll(TaskModel, { user: req.user._id, ...dateFilter })(
+    req,
+    res,
+    next
+  );
 }
 
 export default Router;
