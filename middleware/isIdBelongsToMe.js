@@ -8,7 +8,7 @@ const isIdBelongsToMe = (Model) => {
     if (!document || !document.user.equals(userId))
       return next(
         new AppError(
-          `Document not found userId ${userId}, documentId ${document?._id}`,
+          `Document not found userId ${userId}, documentId ${documentId}`,
           404
         )
       );
