@@ -7,7 +7,7 @@ export const getAll =
     const limit = Math.max(1, +req.query?.limit || 10);
     const data = await Model.find({ ...mainFilters })
       .skip((page - 1) * limit)
-      .limit(limit).populate([...populateArr]);
+      .limit(limit).populate([...populateArr]).sort('-createdAt');
     const totalDocs = await Model.countDocuments({ ...mainFilters });
 
     res.status(200).json({
