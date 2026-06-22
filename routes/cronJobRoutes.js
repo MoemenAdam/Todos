@@ -15,7 +15,7 @@ Router.get('/send-notification', async (req, res, next) => {
     return next(new AppError('who the hell are you ?', 401));
   const data = await runNotificationCronJob();
 
-  res.status(200).json({ status: 'success', data });
+  res.status(200).json({ status: 'success' });
 });
 
 export default Router;

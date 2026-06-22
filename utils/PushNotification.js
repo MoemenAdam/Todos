@@ -1,13 +1,12 @@
-import admin from 'firebase-admin';
+import { getMessaging } from 'firebase-admin/messaging';
 import TaskModel from '../models/taskModel.js';
 
 export const sendNotification = async (messages) => {
   const notifyMessages = Array.isArray(messages) ? messages : [messages];
-
   if (!notifyMessages.length) return;
   try {
     const results = await Promise.allSettled(
-      notifyMessages.map((msg) => admin.messaging().sendEachForMulticast(msg))
+      notifyMessages.map((msg) => getMessaging().sendEachForMulticast(msg))
     );
 
     return results;

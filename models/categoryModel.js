@@ -6,6 +6,10 @@ const Schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    color: {
+      type: String,
+      default:'#000'
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
