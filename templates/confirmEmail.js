@@ -374,7 +374,7 @@ const confirmEmailTemplate = (otp) => `
               <circle cx="12" cy="12" r="9" stroke="#6c63ff" stroke-width="2"/>
               <path d="M12 7v5l3 3" stroke="#6c63ff" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <span class="otp-timer-text">Expires in<br/>10 minutes</span>
+            <span class="otp-timer-text">Expires in<br/>5 minutes</span>
           </div>
         </div>
 

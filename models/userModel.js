@@ -36,6 +36,11 @@ const Schema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    notificationSound: {
+      type: String,
+      enum: ['default'],
+      default: 'default',
+    },
     confirmEmailOTP: String,
     confirmEmailOTPExpires: Date,
     token: String,

@@ -23,6 +23,16 @@ export const userSchema = z.object({
       message: 'Language must be either "en" or "ar"',
     }),
   }),
+  notificationSound: z.enum(['default'], {
+    errorMap: () => ({
+      message: 'Notification sound must be either default or default',
+    }),
+  }),
+  allowNotification: z
+    .boolean({
+      invalid_type_error: 'allowNotification must be a boolean',
+    })
+    .optional(),
   theme: z.enum(['dark', 'light'], {
     errorMap: () => ({
       message: 'Theme must be either "dark" or "light"',
