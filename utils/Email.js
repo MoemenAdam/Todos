@@ -1,6 +1,19 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 import confirmEmailTemplate from '../templates/confirmEmail.js';
 import emailConfirmedTemplate from '../templates/emailConfirmed.js';
+import forgotPasswordTemplate from '../templates/forgotPassword.js';
+import { EMAIL_HERO_CID } from '../templates/emailBase.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const heroImagePath = path.join(__dirname, '../assets/email-hero.png');
+
+const heroAttachment = {
+  filename: 'email-hero.png',
+  path: heroImagePath,
+  cid: EMAIL_HERO_CID,
+};
 
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
@@ -24,6 +37,10 @@ const sendEmail = async (options) => {
       subject = 'Your email confirmed successfully - Assistant';
       html = emailConfirmedTemplate();
       break;
+    case 'FORGOT_PASSWORD':
+      subject = 'Reset your password - Assistant';
+      html = forgotPasswordTemplate(options.code);
+      break;
     default:
       throw new Error(`Unknown email type: ${options.type}`);
   }
@@ -33,6 +50,7 @@ const sendEmail = async (options) => {
     to: options.email,
     subject,
     html,
+    attachments: [heroAttachment],
   };
 
   await transporter.sendMail(mailOptions);

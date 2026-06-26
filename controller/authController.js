@@ -133,7 +133,12 @@ export const forgotPassword = async (req, res, next) => {
     email,
   });
 
-  if (!user) return next(new AppError("Email isn't correct", 400));
+  if (!user) {
+    res.status(200).json({
+      status: 'success',
+      message: 'If Email exist Reset password otp will be sent to your email',
+    });
+  }
 
   const otp = await user.generateResetPasswordOTP();
   await user.save({ validateBeforeSave: false });
@@ -145,7 +150,7 @@ export const forgotPassword = async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    message: 'Reset password otp sent to your email',
+    message: 'If Email exist Reset password otp will be sent to your email',
   });
 };
 
@@ -154,7 +159,7 @@ export const resetPassword = async (req, res, next) => {
     return next(new AppError("Passwords dosn't match", 400));
 
   const user = await UserModel.findOne({
-    email,
+    email: req.body.email,
   });
 
   if (!user) return next(new AppError("Email isn't correct", 400));

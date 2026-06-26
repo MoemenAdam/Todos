@@ -56,6 +56,8 @@ const Schema = new mongoose.Schema(
 Schema.pre('save', async function () {
   if (!this.isModified('password')) return;
   this.password = await bcryptjs.hash(this.password, 12);
+  this.resetPasswordOTP = undefined;
+  this.resetPasswordOTPExpires = undefined;
 });
 
 Schema.methods.generateconfirmEmailOTP = function () {

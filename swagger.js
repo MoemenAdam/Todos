@@ -7,10 +7,17 @@ import {
   loginSchema,
   signUpSchema,
   confirmEmailSchema,
+  resendOtpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from './validators/authValidator.js';
 import { taskSchema } from './validators/taskValidators.js';
 import { categorySchema } from './validators/categoryValidators.js';
-import { fcmTokenSchema } from './validators/userValidators.js';
+import {
+  fcmTokenSchema,
+  userSchema,
+  updatePasswordSchema,
+} from './validators/userValidators.js';
 
 export const registry = new OpenAPIRegistry();
 
@@ -55,6 +62,10 @@ const UserSchema = registry.register(
       .optional()
       .openapi({ example: ['fcm-device-token-abc123'] }),
     allowNotification: z.boolean().optional().openapi({ example: true }),
+    notificationSound: z
+      .enum(['default'])
+      .optional()
+      .openapi({ example: 'default' }),
     createdAt: z.string().openapi({ format: 'date-time' }),
     updatedAt: z.string().openapi({ format: 'date-time' }),
   })
@@ -83,7 +94,11 @@ registry.registerPath({
       content: { 'application/json': { schema: TokenResponse } },
     },
     400: {
-      description: 'Wrong credentials / Email not confirmed',
+      description: 'Wrong email or password',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    403: {
+      description: 'Email not confirmed — OTP resent if expired',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -130,6 +145,78 @@ registry.registerPath({
     },
     400: {
       description: 'Wrong OTP / Expired OTP',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/auth/resendOtp',
+  tags: ['Auth'],
+  summary: 'Resend email confirmation OTP',
+  description:
+    'Sends a new confirmation OTP when the previous one has expired. Fails if the current OTP is still valid.',
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: resendOtpSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Confirmation OTP sent to email',
+      content: { 'application/json': { schema: SuccessResponse } },
+    },
+    400: {
+      description: 'Invalid email / OTP not expired yet',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/auth/forgotPassword',
+  tags: ['Auth'],
+  summary: 'Request a password reset OTP',
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: forgotPasswordSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Reset password OTP sent to email',
+      content: { 'application/json': { schema: SuccessResponse } },
+    },
+    400: {
+      description: 'Invalid email',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/auth/resetPassword',
+  tags: ['Auth'],
+  summary: 'Reset password using OTP',
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: resetPasswordSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Password reset successfully',
+      content: { 'application/json': { schema: SuccessResponse } },
+    },
+    400: {
+      description:
+        'Passwords mismatch / invalid or expired OTP / same password as before',
       content: { 'application/json': { schema: ErrorResponse } },
     },
   },
@@ -189,6 +276,42 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: 'patch',
+  path: '/users/updateMe',
+  tags: ['Users'],
+  summary: 'Update current user profile',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: userSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'User updated successfully',
+      content: {
+        'application/json': {
+          schema: z.object({
+            status: z.string().openapi({ example: 'success' }),
+            data: UserSchema,
+            message: z.string().openapi({ example: 'User updated successfully' }),
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Validation error',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
   method: 'get',
   path: '/users/myProgress',
   tags: ['Users'],
@@ -205,6 +328,74 @@ registry.registerPath({
           }),
         },
       },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+const LeaderBoardEntry = registry.register(
+  'LeaderBoardEntry',
+  z.object({
+    _id: z.string().openapi({ example: '664f1b2c9e1a2b3c4d5e6f7c' }),
+    totalTasks: z.number().openapi({ example: 12 }),
+    totalCompletedTasks: z.number().openapi({ example: 8 }),
+    user: z.object({
+      name: z.string().openapi({ example: 'John Doe' }),
+      email: z.string().email().openapi({ example: 'user@example.com' }),
+    }),
+  })
+);
+
+registry.registerPath({
+  method: 'get',
+  path: '/users/leaderBoard',
+  tags: ['Users'],
+  summary: 'Get global task leaderboard',
+  description:
+    'Returns all users ranked by completed tasks, then total tasks.',
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: 'Leaderboard data',
+      content: {
+        'application/json': {
+          schema: z.object({
+            status: z.string().openapi({ example: 'success' }),
+            data: z.array(LeaderBoardEntry),
+          }),
+        },
+      },
+    },
+    401: {
+      description: 'Unauthorized',
+      content: { 'application/json': { schema: ErrorResponse } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/users/updatePassword',
+  tags: ['Users'],
+  summary: 'Update password for the logged-in user',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      required: true,
+      content: { 'application/json': { schema: updatePasswordSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Password updated successfully',
+      content: { 'application/json': { schema: SuccessResponse } },
+    },
+    400: {
+      description: 'Passwords mismatch / same password as before',
+      content: { 'application/json': { schema: ErrorResponse } },
     },
     401: {
       description: 'Unauthorized',
