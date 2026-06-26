@@ -87,7 +87,7 @@ export const confirmEmail = async (req, res, next) => {
   if (!user || !user.validateConfirmEmailOTP(otp))
     return next(new AppError("Email or OTP isn't correct", 400));
   if (!user.validateConfirmEmailOTPExpires(user.confirmEmailOTPExpires))
-    return next(new AppError('OTP is Expired Login again to get new OTP', 400));
+    return next(new AppError('OTP is Expired click resend otp', 400));
 
   user.confirmEmailOTP = undefined;
   user.confirmEmailOTPExpires = undefined;
@@ -100,5 +100,93 @@ export const confirmEmail = async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: 'Email confirmed successfully please login',
+  });
+};
+
+export const resendOtp = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await UserModel.findOne({
+    email,
+  });
+
+  if (!user) return next(new AppError("Email isn't correct", 400));
+  if (user.validateConfirmEmailOTPExpires(user.confirmEmailOTPExpires))
+    return next(new AppError("Otp isn't expired yet", 400));
+
+  const otp = await user.generateconfirmEmailOTP();
+  await user.save({ validateBeforeSave: false });
+  await sendEmail({
+    email: user.email,
+    type: 'CONFIRM_EMAIL',
+    code: otp,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Confirmation OTP sent to your email',
+  });
+};
+
+export const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await UserModel.findOne({
+    email,
+  });
+
+  if (!user) return next(new AppError("Email isn't correct", 400));
+
+  const otp = await user.generateResetPasswordOTP();
+  await user.save({ validateBeforeSave: false });
+  await sendEmail({
+    email: user.email,
+    type: 'FORGOT_PASSWORD',
+    code: otp,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Reset password otp sent to your email',
+  });
+};
+
+export const resetPassword = async (req, res, next) => {
+  if (req.body.password !== req.body.confirmPassword)
+    return next(new AppError("Passwords dosn't match", 400));
+
+  const user = await UserModel.findOne({
+    email,
+  });
+
+  if (!user) return next(new AppError("Email isn't correct", 400));
+
+  if (!user.validateResetPasswordOTP(req.body.otp)) {
+    return next(new AppError('Reset password otp is invalid', 400));
+  }
+  if (
+    !(await user.validateResetPasswordOTPExpires(user.resetPasswordOTPExpires))
+  ) {
+    const otp = await user.generateResetPasswordOTP();
+    await user.save({ validateBeforeSave: false });
+    await sendEmail({
+      email: user.email,
+      type: 'FORGOT_PASSWORD',
+      code: otp,
+    });
+    return next(
+      new AppError(
+        'Reset password otp is expired new OTP sent to your email',
+        400
+      )
+    );
+  }
+  if (await user.validatePassword(req.body.password)) {
+    return next(new AppError("You can't use the same password", 400));
+  }
+
+  user.password = req.body.password;
+  await user.save();
+  res.status(200).json({
+    status: 'success',
+    message: 'Password have been reseted succesffuly',
   });
 };

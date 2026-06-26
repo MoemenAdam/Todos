@@ -3,6 +3,15 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
 extendZodWithOpenApi(z);
 
+const passwordSchema = z
+  .string({
+    required_error: 'Password is required',
+    invalid_type_error: 'Password must be a string',
+  })
+  .min(8, 'Password must be at least 8 characters long')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number');
+
 export const fcmTokenSchema = z.object({
   token: z.string({
     required_error: 'Token is required',
@@ -38,4 +47,9 @@ export const userSchema = z.object({
       message: 'Theme must be either "dark" or "light"',
     }),
   }),
+});
+
+export const updatePasswordSchema = z.object({
+  password: passwordSchema,
+  confirmPassword: passwordSchema,
 });

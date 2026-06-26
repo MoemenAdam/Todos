@@ -85,3 +85,19 @@ export const getLeaderBoard = async (req, res) => {
     data: data,
   });
 };
+
+export const updatePassword = async (req, res) => {
+  if (req.body.password !== req.body.confirmPassword)
+    return next(new AppError("Passwords dosn't match", 400));
+
+  if (await req.user.validatePassword(req.body.password))
+    return next(new AppError("You can't use the same password", 400));
+
+  req.user.password = req.body.password;
+  await req.user.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated succesffuly',
+  });
+};

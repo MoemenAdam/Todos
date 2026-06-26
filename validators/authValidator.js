@@ -56,3 +56,23 @@ export const confirmEmailSchema = z.object({
     })
     .regex(/^\d{6}$/, 'OTP must be exactly 6 digits'),
 });
+
+export const resendOtpSchema = z.object({
+  email: emailSchema,
+});
+
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+export const resetPasswordSchema = z.object({
+  email: emailSchema,
+  otp: z
+    .string({
+      required_error: 'OTP is required',
+      invalid_type_error: 'OTP must be a string',
+    })
+    .regex(/^\d{6}$/, 'OTP must be exactly 6 digits'),
+  password: passwordSchema,
+  confirmPassword: passwordSchema,
+});

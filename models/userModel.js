@@ -43,6 +43,8 @@ const Schema = new mongoose.Schema(
     },
     confirmEmailOTP: String,
     confirmEmailOTPExpires: Date,
+    resetPasswordOTP: String,
+    resetPasswordOTPExpires: Date,
     token: String,
     deletedAt: Date,
   },
@@ -63,6 +65,13 @@ Schema.methods.generateconfirmEmailOTP = function () {
   return otp;
 };
 
+Schema.methods.generateResetPasswordOTP = function () {
+  const otp = crypto.randomInt(100000, 999999).toString();
+  this.resetPasswordOTP = crypto.createHash('sha256').update(otp).digest('hex');
+  this.resetPasswordOTPExpires = Date.now() + 5 * 60 * 1000;
+  return otp;
+};
+
 Schema.methods.validatePassword = async function (comparePass) {
   return await bcryptjs.compare(comparePass, this.password);
 };
@@ -72,7 +81,12 @@ Schema.methods.validateConfirmEmailOTP = function (newOTP) {
   return hashed === this.confirmEmailOTP;
 };
 
-Schema.methods.validateConfirmEmailOTPExpires = function (Expires) {
+Schema.methods.validateResetPasswordOTP = function (newOTP) {
+  const hashed = crypto.createHash('sha256').update(newOTP).digest('hex');
+  return hashed === this.resetPasswordOTP;
+};
+
+Schema.methods.validateResetPasswordOTPExpires = function (Expires) {
   return Date.now() < Expires;
 };
 
@@ -82,6 +96,8 @@ Schema.set('toJSON', {
     delete ret.password;
     delete ret.confirmEmailOTP;
     delete ret.confirmEmailOTPExpires;
+    delete ret.resetPasswordOTP;
+    delete ret.resetPasswordOTPExpires;
     delete ret.deletedAt;
     return ret;
   },
