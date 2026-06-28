@@ -4,6 +4,7 @@ import buildEmailLayout, {
   sectionDivider,
   warningNote,
 } from './emailBase.js';
+import { EMAIL_ICON_CIDS } from './emailIcons.js';
 
 const forgotPasswordTemplate = (otp) =>
   buildEmailLayout({
@@ -13,7 +14,7 @@ const forgotPasswordTemplate = (otp) =>
     footerActiveDot: 1,
     bodyHtml: `
       ${iconBadge(
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none'%3E%3Crect x='5' y='11' width='14' height='10' rx='2' stroke='%23f59e0b' stroke-width='2'/%3E%3Cpath d='M8 11V7a4 4 0 118 0v4' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='16' r='1.5' fill='%23f59e0b'/%3E%3C/svg%3E",
+        EMAIL_ICON_CIDS.LOCK,
         'rgba(245,158,11,0.12)',
         'rgba(245,158,11,0.25)'
       )}

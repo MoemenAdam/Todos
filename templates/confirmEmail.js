@@ -4,15 +4,14 @@ import buildEmailLayout, {
   sectionDivider,
   warningNote,
 } from './emailBase.js';
+import { EMAIL_ICON_CIDS } from './emailIcons.js';
 
 const confirmEmailTemplate = (otp) =>
   buildEmailLayout({
     title: 'Confirm Your Email – Assistant',
     footerActiveDot: 0,
     bodyHtml: `
-      ${iconBadge(
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' stroke='%236c63ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
-      )}
+      ${iconBadge(EMAIL_ICON_CIDS.EMAIL)}
 
       <h1 class="mobile-title" style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:700;line-height:32px;color:#ffffff;">
         Confirm your email address

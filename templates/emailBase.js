@@ -1,3 +1,5 @@
+import { EMAIL_ICON_CIDS, iconImg } from './emailIcons.js';
+
 export const EMAIL_HERO_CID = 'hero@assistant';
 
 const escapeHtml = (value) =>
@@ -75,7 +77,7 @@ export const buildEmailLayout = ({
                           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="40" height="40" style="width:40px;height:40px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border-radius:10px;">
                             <tr>
                               <td align="center" valign="middle" width="40" height="40" style="width:40px;height:40px;">
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 11l3 3L22 4' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" width="22" height="22" alt="" style="display:block;" />
+                                ${iconImg(EMAIL_ICON_CIDS.LOGO_CHECK, 22, 22)}
                               </td>
                             </tr>
                           </table>
@@ -165,7 +167,7 @@ export const otpBlock = (otp, label = 'Your verification code', expiresText = 'E
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="right" class="mobile-center">
               <tr>
                 <td align="right" style="padding-bottom:4px;">
-                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%236c63ff' stroke-width='2'/%3E%3Cpath d='M12 7v5l3 3' stroke='%236c63ff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" width="18" height="18" alt="" style="display:block;" />
+                  ${iconImg(EMAIL_ICON_CIDS.CLOCK, 18, 18)}
                 </td>
               </tr>
               <tr>
@@ -188,7 +190,7 @@ export const warningNote = (text) => `
       <table role="presentation" cellspacing="0" cellpadding="0" border="0">
         <tr>
           <td valign="top" style="padding-right:10px;line-height:0;">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z' stroke='%23ffba49' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='12' y1='9' x2='12' y2='13' stroke='%23ffba49' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17' stroke='%23ffba49' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" width="16" height="16" alt="" style="display:block;" />
+            ${iconImg(EMAIL_ICON_CIDS.WARNING, 16, 16)}
           </td>
           <td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#7a7e96;">
             ${text}
@@ -202,11 +204,11 @@ export const warningNote = (text) => `
 export const sectionDivider = () =>
   `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:28px 0;"><tr><td height="1" style="height:1px;line-height:1px;background-color:#1f2030;font-size:1px;">&nbsp;</td></tr></table>`;
 
-export const iconBadge = (svgDataUri, bgColor = 'rgba(108,99,255,0.12)', borderColor = 'rgba(108,99,255,0.25)') => `
+export const iconBadge = (iconCid, bgColor = 'rgba(108,99,255,0.12)', borderColor = 'rgba(108,99,255,0.25)') => `
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:24px;">
   <tr>
     <td width="60" height="60" align="center" valign="middle" style="width:60px;height:60px;background-color:${bgColor};border:1px solid ${borderColor};border-radius:16px;">
-      <img src="${svgDataUri}" width="28" height="28" alt="" style="display:block;" />
+      ${iconImg(iconCid, 28, 28)}
     </td>
   </tr>
 </table>`;

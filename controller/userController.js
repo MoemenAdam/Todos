@@ -90,7 +90,10 @@ export const updatePassword = async (req, res) => {
   if (req.body.password !== req.body.confirmPassword)
     return next(new AppError("Passwords dosn't match", 400));
 
-  if (await req.user.validatePassword(req.body.password))
+  if (!(await req.user.validatePassword(req.body.oldPassword)))
+    return next(new AppError('Old password is Incorect', 400));
+
+  if (req.body.password === req.body.oldPassword)
     return next(new AppError("You can't use the same password", 400));
 
   req.user.password = req.body.password;

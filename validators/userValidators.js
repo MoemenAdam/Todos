@@ -7,27 +7,27 @@ const passwordSchema = z
   .string({
     error: (issue) => {
       if (issue.input === undefined) {
-        return 'Password is required';
+        return 'Required';
       }
 
       if (issue.code === 'invalid_type') {
-        return 'Password must be a string';
+        return 'Must be a string';
       }
     },
   })
-  .min(8, 'Password must be at least 8 characters long')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number');
+  .min(8, 'Must be at least 8 characters long')
+  .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Must contain at least one number');
 
 export const fcmTokenSchema = z.object({
   token: z.string({
     error: (issue) => {
       if (issue.input === undefined) {
-        return 'Token is required';
+        return 'Required';
       }
 
       if (issue.code === 'invalid_type') {
-        return 'Token must be a string';
+        return 'Must be a string';
       }
     },
   }),
@@ -38,35 +38,35 @@ export const userSchema = z.object({
     .string({
       error: (issue) => {
         if (issue.code === 'invalid_type') {
-          return 'Name must be a string';
+          return 'Must be a string';
         }
       },
     })
     .trim()
-    .min(2, 'Name must be at least 2 characters long')
-    .max(50, 'Name must not exceed 50 characters'),
+    .min(2, 'Must be at least 2 characters long')
+    .max(50, 'Must not exceed 50 characters'),
   lang: z.enum(['en', 'ar'], {
     errorMap: () => ({
-      message: 'Language must be either "en" or "ar"',
+      message: 'Must be either "en" or "ar"',
     }),
   }),
   notificationSound: z.enum(['default'], {
     errorMap: () => ({
-      message: 'Notification sound must be either default or default',
+      message: 'Must be "default"',
     }),
   }),
   allowNotification: z
     .boolean({
       error: (issue) => {
         if (issue.code === 'invalid_type') {
-          return 'allowNotification must be a boolean';
+          return 'Must be a boolean';
         }
       },
     })
     .optional(),
   theme: z.enum(['dark', 'light'], {
     errorMap: () => ({
-      message: 'Theme must be either "dark" or "light"',
+      message: 'Must be either "dark" or "light"',
     }),
   }),
 });
@@ -74,4 +74,5 @@ export const userSchema = z.object({
 export const updatePasswordSchema = z.object({
   password: passwordSchema,
   confirmPassword: passwordSchema,
+  oldPassword: passwordSchema,
 });

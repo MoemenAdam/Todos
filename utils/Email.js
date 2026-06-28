@@ -5,6 +5,7 @@ import confirmEmailTemplate from '../templates/confirmEmail.js';
 import emailConfirmedTemplate from '../templates/emailConfirmed.js';
 import forgotPasswordTemplate from '../templates/forgotPassword.js';
 import { EMAIL_HERO_CID } from '../templates/emailBase.js';
+import { emailIconAttachments } from '../templates/emailIcons.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const heroImagePath = path.join(__dirname, '../assets/email-hero.png');
@@ -50,7 +51,7 @@ const sendEmail = async (options) => {
     to: options.email,
     subject,
     html,
-    attachments: [heroAttachment],
+    attachments: [heroAttachment, ...emailIconAttachments],
   };
 
   await transporter.sendMail(mailOptions);

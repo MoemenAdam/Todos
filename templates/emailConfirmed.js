@@ -1,4 +1,5 @@
 import buildEmailLayout, { sectionDivider } from './emailBase.js';
+import { EMAIL_ICON_CIDS, iconImg, iconImgInline } from './emailIcons.js';
 
 const emailConfirmedTemplate = () =>
   buildEmailLayout({
@@ -10,7 +11,7 @@ const emailConfirmedTemplate = () =>
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 24px;">
         <tr>
           <td width="72" height="72" align="center" valign="middle" style="width:72px;height:72px;background-color:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:50%;">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M20 6L9 17l-5-5' stroke='%2322c55e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" width="32" height="32" alt="" style="display:block;" />
+            ${iconImg(EMAIL_ICON_CIDS.CHECK_LARGE, 32, 32)}
           </td>
         </tr>
       </table>
@@ -30,7 +31,7 @@ const emailConfirmedTemplate = () =>
             <table role="presentation" cellspacing="0" cellpadding="0" border="0">
               <tr>
                 <td style="background-color:#0b0c0f;border:1px solid #1f2030;border-radius:50px;padding:8px 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#8b8fa8;white-space:nowrap;">
-                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' stroke='%2322c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" width="14" height="14" alt="" style="display:inline-block;vertical-align:middle;margin-right:6px;" />
+                  ${iconImgInline(EMAIL_ICON_CIDS.SHIELD, 14, 14, 'margin-right:6px;')}
                   Account secured
                 </td>
               </tr>
@@ -40,7 +41,7 @@ const emailConfirmedTemplate = () =>
             <table role="presentation" cellspacing="0" cellpadding="0" border="0">
               <tr>
                 <td style="background-color:#0b0c0f;border:1px solid #1f2030;border-radius:50px;padding:8px 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#8b8fa8;white-space:nowrap;">
-                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Crect x='2' y='3' width='20' height='14' rx='2' stroke='%236c63ff' stroke-width='2'/%3E%3Cpath d='M8 21h8M12 17v4' stroke='%236c63ff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" width="14" height="14" alt="" style="display:inline-block;vertical-align:middle;margin-right:6px;" />
+                  ${iconImgInline(EMAIL_ICON_CIDS.MONITOR, 14, 14, 'margin-right:6px;')}
                   Ready to use
                 </td>
               </tr>
@@ -50,7 +51,7 @@ const emailConfirmedTemplate = () =>
             <table role="presentation" cellspacing="0" cellpadding="0" border="0">
               <tr>
                 <td style="background-color:#0b0c0f;border:1px solid #1f2030;border-radius:50px;padding:8px 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#8b8fa8;white-space:nowrap;">
-                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0' stroke='%23a78bfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" width="14" height="14" alt="" style="display:inline-block;vertical-align:middle;margin-right:6px;" />
+                  ${iconImgInline(EMAIL_ICON_CIDS.BELL, 14, 14, 'margin-right:6px;')}
                   Notifications on
                 </td>
               </tr>

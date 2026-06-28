@@ -8,22 +8,22 @@ export const taskSchema = z.object({
     .string({
       error: (issue) => {
         if (issue.input === undefined) {
-          return 'Title is required';
+          return 'Required';
         }
 
         if (issue.code === 'invalid_type') {
-          return 'Title must be a string';
+          return 'Must be a string';
         }
       },
     })
     .trim()
-    .min(1, 'Title is required'),
+    .min(1, 'Cannot be empty'),
 
   description: z
     .string({
       error: (issue) => {
         if (issue.code === 'invalid_type') {
-          return 'Description must be a string';
+          return 'Must be a string';
         }
       },
     })
@@ -33,11 +33,11 @@ export const taskSchema = z.object({
   category: z.string({
     error: (issue) => {
       if (issue.input === undefined) {
-        return 'Category is required';
+        return 'Required';
       }
 
       if (issue.code === 'invalid_type') {
-        return 'Category must be a valid id';
+        return 'Must be a valid id';
       }
     },
   }),
@@ -45,7 +45,7 @@ export const taskSchema = z.object({
   priority: z
     .enum(['low', 'med', 'high'], {
       errorMap: () => ({
-        message: 'Priority must be one of: low, med, high',
+        message: 'Must be one of: low, med, high',
       }),
     })
     .optional(),
@@ -53,15 +53,15 @@ export const taskSchema = z.object({
   dueDate: z.coerce.date({
     error: (issue) => {
       if (issue.input === undefined) {
-        return 'dueDate is required';
+        return 'Required';
       }
 
       if (issue.code === 'invalid_type') {
-        return 'dueDate must be a valid date';
+        return 'Must be a valid date';
       }
     },
     errorMap: () => ({
-      message: 'Due date must be a valid date',
+      message: 'Must be a valid date',
     }),
   }),
 
@@ -69,7 +69,7 @@ export const taskSchema = z.object({
     .boolean({
       error: (issue) => {
         if (issue.code === 'invalid_type') {
-          return 'isCompleted must be a boolean value';
+          return 'Must be a boolean';
         }
       },
     })
