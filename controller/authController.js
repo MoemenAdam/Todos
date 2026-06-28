@@ -84,6 +84,8 @@ export const confirmEmail = async (req, res, next) => {
     email,
   });
 
+  if (!user.confirmEmailOTP)
+    return next(new AppError('User Email allready confirmed', 400));
   if (!user || !user.validateConfirmEmailOTP(otp))
     return next(new AppError("Email or OTP isn't correct", 400));
   if (!user.validateOTPExpires(user.confirmEmailOTPExpires))
@@ -110,6 +112,8 @@ export const resendOtp = async (req, res, next) => {
   });
 
   if (!user) return next(new AppError("Email isn't correct", 400));
+  if (!user.confirmEmailOTP)
+    return next(new AppError('User Email allready confirmed', 400));
   if (user.validateOTPExpires(user.confirmEmailOTPExpires))
     return next(new AppError("Otp isn't expired yet", 400));
 
