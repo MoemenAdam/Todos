@@ -88,7 +88,7 @@ Schema.methods.validateResetPasswordOTP = function (newOTP) {
   return hashed === this.resetPasswordOTP;
 };
 
-Schema.methods.validateResetPasswordOTPExpires = function (Expires) {
+Schema.methods.validateOTPExpires = function (Expires) {
   return Date.now() < Expires;
 };
 

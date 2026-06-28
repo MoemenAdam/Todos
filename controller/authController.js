@@ -15,7 +15,7 @@ export const login = async (req, res, next) => {
   }
 
   if (user.confirmEmailOTP) {
-    if (!user.validateConfirmEmailOTPExpires(user.confirmEmailOTPExpires)) {
+    if (!user.validateOTPExpires(user.confirmEmailOTPExpires)) {
       const otp = await user.generateconfirmEmailOTP();
       await user.save({ validateBeforeSave: false });
       await sendEmail({
@@ -86,7 +86,7 @@ export const confirmEmail = async (req, res, next) => {
 
   if (!user || !user.validateConfirmEmailOTP(otp))
     return next(new AppError("Email or OTP isn't correct", 400));
-  if (!user.validateConfirmEmailOTPExpires(user.confirmEmailOTPExpires))
+  if (!user.validateOTPExpires(user.confirmEmailOTPExpires))
     return next(new AppError('OTP is Expired click resend otp', 400));
 
   user.confirmEmailOTP = undefined;
@@ -110,7 +110,7 @@ export const resendOtp = async (req, res, next) => {
   });
 
   if (!user) return next(new AppError("Email isn't correct", 400));
-  if (user.validateConfirmEmailOTPExpires(user.confirmEmailOTPExpires))
+  if (user.validateOTPExpires(user.confirmEmailOTPExpires))
     return next(new AppError("Otp isn't expired yet", 400));
 
   const otp = await user.generateconfirmEmailOTP();
@@ -167,9 +167,7 @@ export const resetPassword = async (req, res, next) => {
   if (!user.validateResetPasswordOTP(req.body.otp)) {
     return next(new AppError('Reset password otp is invalid', 400));
   }
-  if (
-    !(await user.validateResetPasswordOTPExpires(user.resetPasswordOTPExpires))
-  ) {
+  if (!(await user.validateOTPExpires(user.resetPasswordOTPExpires))) {
     const otp = await user.generateResetPasswordOTP();
     await user.save({ validateBeforeSave: false });
     await sendEmail({
