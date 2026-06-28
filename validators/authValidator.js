@@ -5,8 +5,15 @@ extendZodWithOpenApi(z);
 
 const passwordSchema = z
   .string({
-    required_error: 'Password is required',
-    invalid_type_error: 'Password must be a string',
+    error: (issue) => {
+      if (issue.input === undefined) {
+        return 'Password is required';
+      }
+
+      if (issue.code === 'invalid_type') {
+        return 'Password must be a string';
+      }
+    },
   })
   .min(8, 'Password must be at least 8 characters long')
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -14,7 +21,15 @@ const passwordSchema = z
 
 const emailSchema = z
   .email({
-    required_error: 'Email is required',
+    error: (issue) => {
+      if (issue.input === undefined) {
+        return 'Email is required';
+      }
+
+      if (issue.code === 'invalid_type') {
+        return 'Email must be a string';
+      }
+    },
   })
   .trim()
   .toLowerCase();
@@ -27,8 +42,15 @@ export const loginSchema = z.object({
 export const signUpSchema = z.object({
   name: z
     .string({
-      required_error: 'Name is required',
-      invalid_type_error: 'Name must be a string',
+      error: (issue) => {
+        if (issue.input === undefined) {
+          return 'Name is required';
+        }
+
+        if (issue.code === 'invalid_type') {
+          return 'Name must be a string';
+        }
+      },
     })
     .trim()
     .min(2, 'Name must be at least 2 characters long')
@@ -51,8 +73,15 @@ export const confirmEmailSchema = z.object({
   email: emailSchema,
   otp: z
     .string({
-      required_error: 'OTP is required',
-      invalid_type_error: 'OTP must be a string',
+      error: (issue) => {
+        if (issue.input === undefined) {
+          return 'OTP is required';
+        }
+
+        if (issue.code === 'invalid_type') {
+          return 'OTP must be a string';
+        }
+      },
     })
     .regex(/^\d{6}$/, 'OTP must be exactly 6 digits'),
 });
@@ -69,8 +98,15 @@ export const resetPasswordSchema = z.object({
   email: emailSchema,
   otp: z
     .string({
-      required_error: 'OTP is required',
-      invalid_type_error: 'OTP must be a string',
+      error: (issue) => {
+        if (issue.input === undefined) {
+          return 'OTP is required';
+        }
+
+        if (issue.code === 'invalid_type') {
+          return 'OTP must be a string';
+        }
+      },
     })
     .regex(/^\d{6}$/, 'OTP must be exactly 6 digits'),
   password: passwordSchema,

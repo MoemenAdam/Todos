@@ -6,22 +6,40 @@ extendZodWithOpenApi(z);
 export const taskSchema = z.object({
   title: z
     .string({
-      required_error: 'Title is required',
-      invalid_type_error: 'Title must be a string',
+      error: (issue) => {
+        if (issue.input === undefined) {
+          return 'Title is required';
+        }
+
+        if (issue.code === 'invalid_type') {
+          return 'Title must be a string';
+        }
+      },
     })
     .trim()
     .min(1, 'Title is required'),
 
   description: z
     .string({
-      invalid_type_error: 'Description must be a string',
+      error: (issue) => {
+        if (issue.code === 'invalid_type') {
+          return 'Description must be a string';
+        }
+      },
     })
     .trim()
     .optional(),
 
   category: z.string({
-    required_error: 'Category is required',
-    invalid_type_error: 'Category must be a valid id',
+    error: (issue) => {
+      if (issue.input === undefined) {
+        return 'Category is required';
+      }
+
+      if (issue.code === 'invalid_type') {
+        return 'Category must be a valid id';
+      }
+    },
   }),
 
   priority: z
@@ -33,8 +51,15 @@ export const taskSchema = z.object({
     .optional(),
 
   dueDate: z.coerce.date({
-    required_error: 'dueDate is required',
-    invalid_type_error: 'dueDate must be a valid date',
+    error: (issue) => {
+      if (issue.input === undefined) {
+        return 'dueDate is required';
+      }
+
+      if (issue.code === 'invalid_type') {
+        return 'dueDate must be a valid date';
+      }
+    },
     errorMap: () => ({
       message: 'Due date must be a valid date',
     }),
@@ -42,7 +67,11 @@ export const taskSchema = z.object({
 
   isCompleted: z
     .boolean({
-      invalid_type_error: 'isCompleted must be a boolean value',
+      error: (issue) => {
+        if (issue.code === 'invalid_type') {
+          return 'isCompleted must be a boolean value';
+        }
+      },
     })
     .optional(),
 });

@@ -5,8 +5,15 @@ extendZodWithOpenApi(z);
 
 const passwordSchema = z
   .string({
-    required_error: 'Password is required',
-    invalid_type_error: 'Password must be a string',
+    error: (issue) => {
+      if (issue.input === undefined) {
+        return 'Password is required';
+      }
+
+      if (issue.code === 'invalid_type') {
+        return 'Password must be a string';
+      }
+    },
   })
   .min(8, 'Password must be at least 8 characters long')
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -14,15 +21,26 @@ const passwordSchema = z
 
 export const fcmTokenSchema = z.object({
   token: z.string({
-    required_error: 'Token is required',
-    invalid_type_error: 'Token must be a string',
+    error: (issue) => {
+      if (issue.input === undefined) {
+        return 'Token is required';
+      }
+
+      if (issue.code === 'invalid_type') {
+        return 'Token must be a string';
+      }
+    },
   }),
 });
 
 export const userSchema = z.object({
   name: z
     .string({
-      invalid_type_error: 'Name must be a string',
+      error: (issue) => {
+        if (issue.code === 'invalid_type') {
+          return 'Name must be a string';
+        }
+      },
     })
     .trim()
     .min(2, 'Name must be at least 2 characters long')
@@ -39,7 +57,11 @@ export const userSchema = z.object({
   }),
   allowNotification: z
     .boolean({
-      invalid_type_error: 'allowNotification must be a boolean',
+      error: (issue) => {
+        if (issue.code === 'invalid_type') {
+          return 'allowNotification must be a boolean';
+        }
+      },
     })
     .optional(),
   theme: z.enum(['dark', 'light'], {
