@@ -41,6 +41,7 @@ export const assignFCMtoken = async (req, res) => {
     userFcmTokens.push(el);
   });
   req.user.fcmTokens = userFcmTokens;
+  req.user.allowNotification = true;
   await req.user.save({ validateBeforeSave: false });
 
   res.status(202).json({

@@ -11,7 +11,6 @@ import userRoutes from './routes/userRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 const app = express();
-;
 const swaggerUiOptions = {
   customCssUrl: 'https://unpkg.com/swagger-ui-dist@5/swagger-ui.css',
   customJs: [

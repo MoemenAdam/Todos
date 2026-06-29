@@ -34,7 +34,7 @@ const Schema = new mongoose.Schema(
     fcmTokens: [String],
     allowNotification: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     notificationSound: {
       type: String,

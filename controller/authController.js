@@ -63,11 +63,16 @@ export const signUp = async (req, res, next) => {
   const user = await UserModel.create({ name, email, password, lang, theme });
   const otp = await user.generateconfirmEmailOTP();
   await user.save({ validateBeforeSave: false });
-  await sendEmail({
-    email: user.email,
-    type: 'CONFIRM_EMAIL',
-    code: otp,
-  });
+  try {
+    await sendEmail({
+      email: user.email,
+      type: 'CONFIRM_EMAIL',
+      code: otp,
+    });
+  } catch (err) {
+    await UserModel.deleteOne({ _id: user._id });
+    return next(err);
+  }
 
   res.status(201).json({
     status: 'success',
